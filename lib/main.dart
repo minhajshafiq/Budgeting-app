@@ -1,11 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'utils/constants.dart';
+import 'utils/theme_provider.dart';
 import 'screens/signup_page.dart';
 import 'screens/login_page.dart';
 import 'screens/main_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  // Initialiser Flutter d'abord
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Créer le gestionnaire de thème sans attendre l'initialisation
+  final themeProvider = ThemeProvider();
+  
+  // Lancer l'application immédiatement
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => themeProvider,
+      child: const MyApp(),
+    ),
+  );
+  
+  // Initialiser le thème après le lancement de l'app
+  themeProvider.initialize();
 }
 
 class MyApp extends StatelessWidget {
@@ -13,13 +30,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    
     return MaterialApp(
       title: 'Gestion de Budget',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-        useMaterial3: true,
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: const WelcomePage(),
     );
   }

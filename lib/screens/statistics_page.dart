@@ -42,8 +42,9 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: Stack(
         children: [
           SafeArea(
@@ -53,15 +54,15 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeader(context),
+                    _buildHeader(context, isDark),
                     const SizedBox(height: 24),
-                    _buildExpensesCard(),
+                    _buildExpensesCard(isDark),
                     const SizedBox(height: 24),
-                    _buildTimeFilters(),
+                    _buildTimeFilters(isDark),
                     const SizedBox(height: 24),
-                    _buildTransactionsHeader(),
+                    _buildTransactionsHeader(isDark),
                     const SizedBox(height: 16),
-                    _buildTransactionsList(),
+                    _buildTransactionsList(isDark),
                     // Espace en bas pour la barre de navigation
                     const SizedBox(height: 80),
                   ],
@@ -69,30 +70,26 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
               ),
             ),
           ),
-          if (_showPeriodSelector) _buildPeriodSelector(),
+          if (_showPeriodSelector) _buildPeriodSelector(isDark),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Container(
-          width: 40,
-          height: 40,
-          decoration: AppDecorations.circleButtonDecoration,
+          decoration: AppDecorations.getCircleButtonDecoration(context),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.text, size: 20),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            icon: Icon(Icons.arrow_back, size: 20, color: Theme.of(context).iconTheme.color),
+            onPressed: () => Navigator.pop(context),
           ),
         ),
-        const Text(
+        Text(
           'Vos Statistiques',
-          style: AppTextStyles.title,
+          style: AppTextStyles.title(context),
         ),
         Row(
           children: [
@@ -111,14 +108,14 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
             const SizedBox(width: 8),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? AppColors.surfaceDark : Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.border, width: 1),
+                border: Border.all(color: isDark ? AppColors.borderDark : AppColors.border, width: 1),
               ),
-              padding: const EdgeInsets.all(6),
-              child: const Icon(
+              padding: EdgeInsets.all(6),
+              child: Icon(
                 Icons.settings_outlined,
-                color: AppColors.text,
+                color: isDark ? AppColors.textDark : AppColors.text,
                 size: 18,
               ),
             ),
@@ -128,7 +125,7 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
     );
   }
 
-  Widget _buildExpensesCard() {
+  Widget _buildExpensesCard(bool isDark) {
     return CardContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,9 +133,9 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Dépensé',
-                style: AppTextStyles.header,
+                style: AppTextStyles.header(context),
               ),
               GestureDetector(
                 onTap: () {
@@ -149,21 +146,22 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.border, width: 1),
+                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: isDark ? AppColors.borderDark : AppColors.border, width: 1),
                   ),
                   child: Row(
                     children: [
                       Text(
                         _selectedPeriod,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
+                          color: isDark ? AppColors.textDark : AppColors.text, // Added theme-aware color
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(Icons.keyboard_arrow_down, size: 16),
+                      Icon(Icons.keyboard_arrow_down, size: 16, color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary), // Added theme-aware color
                     ],
                   ),
                 ),
@@ -171,12 +169,12 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
             ],
           ),
           const SizedBox(height: 0),
-          const Text(
+          Text(
             '520,76 €',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppColors.text,
+              color: isDark ? AppColors.textDark : AppColors.text,
             ),
           ),
           const SizedBox(height: 2),
@@ -187,11 +185,11 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
                 painter: ArrowUpPainter(color: AppColors.red),
               ),
               const SizedBox(width: 4),
-              const Text(
+              Text(
                 '50 € en plus que la semaine dernière',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Color(0xFF4B5563),
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                 ),
               ),
             ],
@@ -205,8 +203,8 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildSummaryItem('Revenu', '+300 €', AppColors.green, isRevenu: true),
-              _buildSummaryItem('Dépense', '-300 €', AppColors.red, isRevenu: false),
+              _buildSummaryItem('Revenu', '+300 €', AppColors.green, isRevenu: true, isDark: isDark),
+              _buildSummaryItem('Dépense', '-300 €', AppColors.red, isRevenu: false, isDark: isDark),
             ],
           ),
         ],
@@ -214,13 +212,13 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
     );
   }
 
-  Widget _buildSummaryItem(String title, String amount, Color color, {required bool isRevenu}) {
+  Widget _buildSummaryItem(String title, String amount, Color color, {required bool isRevenu, required bool isDark}) {
     return Container(
       padding: const EdgeInsets.fromLTRB(8, 6, 14, 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(40),
-        border: Border.all(color: AppColors.border, width: 1),
+        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.border, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -229,7 +227,9 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: isRevenu ? const Color(0xFFE6F8EA) : const Color(0xFFFDE8E8),
+              color: isRevenu 
+                  ? (isDark ? AppColors.green.withOpacity(0.2) : const Color(0xFFE6F8EA)) 
+                  : (isDark ? AppColors.red.withOpacity(0.2) : const Color(0xFFFDE8E8)),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -250,16 +250,17 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
               children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF4B5563),
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                   ),
                   Text(
                     amount,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
+                      color: color, // Ensure the semantic color is applied
                     ),
                   ),
                 ],
@@ -270,15 +271,15 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
     );
   }
 
-  Widget _buildTimeFilters() {
+  Widget _buildTimeFilters(bool isDark) {
     final List<String> filters = ['1 s', '1 m', '6 m', '1 a'];
     
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.border, width: 1),
+        border: Border.all(color: isDark ? AppColors.borderDark : AppColors.border, width: 1),
       ),
       child: Row(
         children: filters.map((filter) {
@@ -293,13 +294,13 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
               child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : Colors.white,
+                  color: isSelected ? AppColors.primary : (isDark ? AppColors.surfaceDark : Colors.white),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Text(
                   filter,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
+                    color: isSelected ? Colors.white : (isDark ? AppColors.textDark : AppColors.text),
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
@@ -311,14 +312,14 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
     );
   }
 
-  Widget _buildTransactionsHeader() {
-    return const Text(
+  Widget _buildTransactionsHeader(bool isDark) {
+    return Text(
       'Transactions récentes',
-      style: AppTextStyles.subtitle,
+      style: AppTextStyles.subtitle(context),
     );
   }
 
-  Widget _buildTransactionsList() {
+  Widget _buildTransactionsList(bool isDark) {
     return CardContainer(
       child: Column(
         children: List.generate(5, (index) {
@@ -333,10 +334,10 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
                 ),
               ),
               if (index < 4)
-                const Divider(
+                Divider(
                   height: 1,
                   thickness: 1,
-                  color: AppColors.border,
+                  color: isDark ? AppColors.borderDark : AppColors.border,
                 ),
             ],
           );
@@ -345,7 +346,7 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
     );
   }
 
-  Widget _buildPeriodSelector() {
+  Widget _buildPeriodSelector(bool isDark) {
     final List<String> periods = ['Weekly', 'Monthly', 'Yearly'];
     
     return Positioned(
@@ -388,17 +389,15 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24),
-                    ),
+                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: isDark ? AppColors.borderDark : AppColors.border, width: 1),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
+                        color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.1),
                         blurRadius: 10,
-                        spreadRadius: 5,
-                        offset: const Offset(0, -2),
+                        spreadRadius: isDark ? 1 : 2,
+                        offset: const Offset(0, 2),
                       )
                     ],
                   ),
@@ -411,7 +410,7 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
                         width: 40,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
+                          color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -440,11 +439,12 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  const Text(
+                                  Text(
                                     'Sélectionner une période',
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
+                                      color: isDark ? AppColors.textDark : AppColors.text,
                                     ),
                                   ),
                                 ],
@@ -486,10 +486,14 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
                                   margin: const EdgeInsets.only(bottom: 12),
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                                   decoration: BoxDecoration(
-                                    color: period == _selectedPeriod ? AppColors.primary.withOpacity(0.1) : Colors.grey.shade50,
+                                    color: period == _selectedPeriod 
+                                        ? AppColors.primary.withOpacity(0.1) 
+                                        : (isDark ? AppColors.borderDark : Colors.grey.shade50),
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: period == _selectedPeriod ? AppColors.primary : Colors.grey.shade200,
+                                      color: period == _selectedPeriod 
+                                          ? AppColors.primary 
+                                          : (isDark ? AppColors.borderDark.withOpacity(0.7) : Colors.grey.shade200),
                                       width: 1,
                                     ),
                                   ),
@@ -499,10 +503,14 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
                                         width: 24,
                                         height: 24,
                                         decoration: BoxDecoration(
-                                          color: period == _selectedPeriod ? AppColors.primary : Colors.white,
+                                          color: period == _selectedPeriod 
+                                              ? AppColors.primary 
+                                              : (isDark ? AppColors.surfaceDark : Colors.white),
                                           shape: BoxShape.circle,
                                           border: Border.all(
-                                            color: period == _selectedPeriod ? AppColors.primary : Colors.grey.shade300,
+                                            color: period == _selectedPeriod 
+                                                ? AppColors.primary 
+                                                : (isDark ? AppColors.borderDark : Colors.grey.shade300),
                                             width: 1,
                                           ),
                                         ),
@@ -516,7 +524,9 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: period == _selectedPeriod ? FontWeight.bold : FontWeight.normal,
-                                          color: period == _selectedPeriod ? AppColors.primary : Colors.black87,
+                                          color: period == _selectedPeriod 
+                                              ? AppColors.primary 
+                                              : (isDark ? AppColors.textDark.withOpacity(0.87) : Colors.black87),
                                         ),
                                       ),
                                     ],

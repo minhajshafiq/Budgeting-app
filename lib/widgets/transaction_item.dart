@@ -37,9 +37,16 @@ class TransactionItem extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark 
+                  ? AppColors.surfaceDark 
+                  : Colors.white,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border, width: 1),
+                border: Border.all(
+                  color: Theme.of(context).brightness == Brightness.dark 
+                    ? AppColors.borderDark 
+                    : AppColors.border, 
+                  width: 1
+                ),
               ),
               child: ClipOval(
                 child: Padding(
@@ -85,7 +92,9 @@ class TransactionItem extends StatelessWidget {
                 fontSize: 16,
                 color: amount.startsWith('+') 
                     ? Colors.green.shade700 
-                    : Colors.black,
+                    : Theme.of(context).brightness == Brightness.dark 
+                        ? AppColors.textDark 
+                        : Colors.black,
               ),
             ),
           ],
@@ -129,16 +138,20 @@ class TransactionItem extends StatelessWidget {
                   bottom: MediaQuery.of(context).viewInsets.bottom,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).brightness == Brightness.dark 
+                    ? AppColors.surfaceDark 
+                    : Colors.white,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.black.withOpacity(0.3) 
+                        : Colors.black.withOpacity(0.15),
                       blurRadius: 10,
-                      spreadRadius: 5,
+                      spreadRadius: Theme.of(context).brightness == Brightness.dark ? 2 : 5,
                       offset: const Offset(0, -2),
                     )
                   ],
@@ -149,11 +162,13 @@ class TransactionItem extends StatelessWidget {
                     // Barre de drag
                     Container(
                       margin: const EdgeInsets.only(top: 12),
-                      width: 40,
-                      height: 4,
+                      width: 70,
+                      height: 5,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(2),
+                        color: Theme.of(context).brightness == Brightness.dark 
+                          ? Colors.grey[700] 
+                          : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     

@@ -21,6 +21,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   late Animation<double> _fadeAnimation;
   late List<Animation<double>> _transactionAnimations;
   
+  // Variable pour le mode sombre
+  late bool isDark;
+  
   // Liste des transactions
   late List<Map<String, dynamic>> _transactions;
 
@@ -92,6 +95,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _animationController.dispose();
     super.dispose();
   }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isDark = Theme.of(context).brightness == Brightness.dark;
+  }
 
   // Méthode pour mettre à jour une transaction
   void _updateTransaction(int index, Map<String, dynamic> updatedData) {
@@ -107,7 +116,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -139,29 +148,36 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Widget _buildHeader() {
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
-              'Hello,',
+              'Bonjour',
               style: TextStyle(
                 fontSize: 16,
-                color: AppColors.textSecondary,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
             Text(
               'Joe Don',
-              style: AppTextStyles.title,
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
         Container(
-          decoration: AppDecorations.circleButtonDecoration,
+          decoration: AppDecorations.getCircleButtonDecoration(context),
           child: IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: AppColors.text),
+            icon: Icon(
+              Icons.notifications_outlined, 
+              color: Theme.of(context).textTheme.bodyLarge!.color,
+            ),
             onPressed: () {},
           ),
         ),
@@ -174,9 +190,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Solde actuel',
-            style: AppTextStyles.header,
+            style: AppTextStyles.header(context),
           ),
           const SizedBox(height: 2),
           Row(
@@ -184,16 +200,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             children: [
               AnimatedCounter(
                 value: 4520.76,
-                style: AppTextStyles.amountSmall,
+                style: AppTextStyles.amountSmall(context),
                 suffix: ' €',
                 decimalPlaces: 2,
                 decimalSeparator: ',',
                 thousandSeparator: ' ',
               ),
               Container(
-                decoration: AppDecorations.circleButtonDecoration,
+                decoration: AppDecorations.getCircleButtonDecoration(context),
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_forward, color: AppColors.text),
+                  icon: Icon(
+                    Icons.arrow_forward, 
+                    color: Theme.of(context).textTheme.bodyLarge!.color,
+                  ),
                   onPressed: () {},
                 ),
               ),
@@ -202,11 +221,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           const SizedBox(height: 2),
           Row(
             children: [
-              const Text(
+              Text(
                 'Dernière 24h',
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).brightness == Brightness.dark 
+                    ? AppColors.textSecondaryDark 
+                    : AppColors.textSecondary,
                 ),
               ),
               const SizedBox(width: 4),
@@ -219,9 +240,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   const SizedBox(width: 4),
                   AnimatedCounter(
                     value: 10.99,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.text,
+                      color: Theme.of(context).textTheme.bodyLarge!.color,
                       fontWeight: FontWeight.normal,
                     ),
                     suffix: '€',
@@ -244,15 +265,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Dépensé cette semaine',
-            style: AppTextStyles.header,
+            style: AppTextStyles.header(context),
           ),
           Transform.translate(
             offset: const Offset(0, -2),
             child: AnimatedCounter(
               value: 520.76,
-              style: AppTextStyles.amountSmall,
+              style: AppTextStyles.amountSmall(context),
               prefix: '-',
               suffix: ' €',
               decimalPlaces: 2,
@@ -320,7 +341,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         const SizedBox(height: 4),
         Text(
           label,
-          style: AppTextStyles.navLabel,
+          style: AppTextStyles.navLabel(context),
         ),
       ],
     );
@@ -350,10 +371,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           onUpdate: (updatedData) => _updateTransaction(index, updatedData),
                         ),
                         if (index < _transactions.length - 1)
-                          const Divider(
+                          Divider(
                             height: 20,
                             thickness: 1,
-                            color: AppColors.border,
+                            color: isDark ? AppColors.borderDark : AppColors.border,
                           ),
                       ],
                     ),

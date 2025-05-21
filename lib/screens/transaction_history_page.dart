@@ -16,6 +16,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   DateTime _selectedMonth = DateTime(2025, 5); // Mai 2025
   int? _selectedDay = 20; // Jour actuel (20 Mai 2025)
   
+  // Variable pour le mode sombre
+  late bool isDark;
+  
   // Jours avec des transactions
   final Set<int> _highlightedDays = {4, 11, 15, 18, 20, 23, 28, 31};
   
@@ -96,9 +99,15 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   };
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isDark = Theme.of(context).brightness == Brightness.dark;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -110,15 +119,19 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      decoration: AppDecorations.circleButtonDecoration,
+                      decoration: AppDecorations.getCircleButtonDecoration(context),
                       child: IconButton(
-                        icon: const Icon(Icons.arrow_back, size: 20),
+                        icon: Icon(
+                          Icons.arrow_back, 
+                          size: 20,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
-                    const Text(
+                    Text(
                       'Vos Transactions',
-                      style: AppTextStyles.title,
+                      style: AppTextStyles.title(context),
                     ),
                     // Élément invisible pour équilibrer le titre au centre
                     SizedBox(width: 40, height: 40),
@@ -130,9 +143,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: const Text(
+                child: Text(
                   'Transactions',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+                  style: AppTextStyles.subtitle(context),
                 ),
               ),
               const SizedBox(height: 8),
@@ -143,7 +156,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
                     'Transactions du ${_selectedDay} ${_getMonthYearText()}',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+                    style: TextStyle(
+                      fontSize: 16, 
+                      fontWeight: FontWeight.normal,
+                      color: Theme.of(context).textTheme.bodyLarge!.color,
+                    ),
                   ),
                 ),
               const SizedBox(height: 8),
@@ -161,10 +178,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   }
 
   Widget _buildCalendar() {
+    
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2E3A59),
+        color: isDark ? const Color(0xFF1E2746) : const Color(0xFF2E3A59),
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -178,7 +196,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               children: [
                 Text(
                   _getMonthYearText(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -187,7 +205,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+                      icon: Icon(
+                        Icons.chevron_left, 
+                        size: 28,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
                       onPressed: () {
                         setState(() {
                           _selectedMonth = DateTime(
@@ -198,7 +220,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       },
                     ),
                     IconButton(
-                      icon: const Icon(Icons.chevron_right, color: Colors.white, size: 28),
+                      icon: Icon(
+                        Icons.chevron_right, 
+                        size: 28,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
                       onPressed: () {
                         setState(() {
                           _selectedMonth = DateTime(
@@ -219,14 +245,14 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                SizedBox(width: 36, child: Center(child: Text('L', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)))),
-                SizedBox(width: 36, child: Center(child: Text('M', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)))),
-                SizedBox(width: 36, child: Center(child: Text('M', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)))),
-                SizedBox(width: 36, child: Center(child: Text('J', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)))),
-                SizedBox(width: 36, child: Center(child: Text('V', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)))),
-                SizedBox(width: 36, child: Center(child: Text('S', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)))),
-                SizedBox(width: 36, child: Center(child: Text('D', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)))),
+               children: [
+                SizedBox(width: 36, child: Center(child: Text('L', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
+                SizedBox(width: 36, child: Center(child: Text('M', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
+                SizedBox(width: 36, child: Center(child: Text('M', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
+                SizedBox(width: 36, child: Center(child: Text('J', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
+                SizedBox(width: 36, child: Center(child: Text('V', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
+                SizedBox(width: 36, child: Center(child: Text('S', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
+                SizedBox(width: 36, child: Center(child: Text('D', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
               ],
             ),
           ),
@@ -410,7 +436,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 child: Text(
                   _tabs[index],
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
+                    color: isSelected ? Colors.white : (isDark ? AppColors.textDark : Colors.black),
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
@@ -436,14 +462,14 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               Icon(
                 Icons.receipt_long_outlined,
                 size: 48,
-                color: Colors.grey[400],
+                color: isDark ? Colors.grey[600] : Colors.grey[400],
               ),
               const SizedBox(height: 8),
               Text(
                 _selectedDay != null 
                     ? 'Aucune transaction le ${_selectedDay} ${_getMonthYearText()}' 
                     : 'Sélectionnez une date pour voir les transactions',
-                style: TextStyle(color: Colors.grey[600]),
+                style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
             ],

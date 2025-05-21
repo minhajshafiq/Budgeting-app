@@ -23,14 +23,14 @@ class BarChart extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: data.map((item) {
-            return _buildBar(item);
+            return _buildBar(context, item); // ✅ correction ici
           }).toList(),
         ),
       ),
     );
   }
 
-  Widget _buildBar(Map<String, dynamic> item) {
+  Widget _buildBar(BuildContext context, Map<String, dynamic> item) { // ✅ correction ici
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
@@ -38,7 +38,7 @@ class BarChart extends StatelessWidget {
         if (daysWithLabel.contains(item['day']))
           Text(
             item['value'],
-            style: AppTextStyles.barValue,
+            style: AppTextStyles.barValue(context), // ✅ utilisable maintenant
           )
         else
           const SizedBox(height: 12),
@@ -67,4 +67,4 @@ class BarChart extends StatelessWidget {
       ],
     );
   }
-} 
+}

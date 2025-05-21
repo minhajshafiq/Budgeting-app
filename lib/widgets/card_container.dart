@@ -16,7 +16,7 @@ class CardContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: decoration ?? AppDecorations.cardDecoration,
+      decoration: decoration ?? AppDecorations.getCardDecoration(context),
       padding: padding ?? AppPadding.card,
       child: child,
     );
