@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'constants.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../core/constants/constants.dart';
+import '../core/services/secure_storage_service.dart';
 
 class ThemeProvider extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light;
   bool get isDarkMode => _themeMode == ThemeMode.dark;
+
+  // Service de stockage sécurisé
+  final SecureStorageService _secureStorage = SecureStorageService();
 
   // Singleton pattern
   static final ThemeProvider _instance = ThemeProvider._internal();
   factory ThemeProvider() => _instance;
   ThemeProvider._internal();
 
-  // Initialiser le thème depuis les préférences
+  // Initialiser le thème depuis les préférences sécurisées
   Future<void> initialize() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final isDark = prefs.getBool('isDarkMode') ?? false;
+      final preferences = await _secureStorage.getThemePreferences();
+      final isDark = preferences['isDarkMode'] as bool? ?? false;
       _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
       notifyListeners();
     } catch (e) {
@@ -31,8 +35,10 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isDarkMode', isDarkMode);
+      await _secureStorage.saveThemePreferences(
+        themeMode: _themeMode.name,
+        isDarkMode: isDarkMode,
+      );
     } catch (e) {
       print('Erreur lors de la sauvegarde du thème: $e');
       // Continuer même si la sauvegarde échoue
@@ -48,21 +54,27 @@ final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.background,
+  fontFamily: GoogleFonts.inter().fontFamily,
   colorScheme: ColorScheme.light(
     primary: AppColors.primary,
-    secondary: AppColors.primary,
+    secondary: AppColors.secondary,
     background: AppColors.background,
     surface: AppColors.surface,
     onSurface: AppColors.text,
     onBackground: AppColors.text,
+    error: AppColors.red,
+    onError: Colors.white,
   ),
-  textTheme: TextTheme(
-    bodyLarge: TextStyle(color: AppColors.text),
-    bodyMedium: TextStyle(color: AppColors.text),
-    titleLarge: TextStyle(color: AppColors.text),
-    titleMedium: TextStyle(color: AppColors.text),
-    titleSmall: TextStyle(color: AppColors.text),
-    labelMedium: TextStyle(color: AppColors.textSecondary),
+  textTheme: GoogleFonts.interTextTheme().apply(
+    bodyColor: AppColors.text,
+    displayColor: AppColors.text,
+  ).copyWith(
+    bodyLarge: GoogleFonts.inter(color: AppColors.text),
+    bodyMedium: GoogleFonts.inter(color: AppColors.text),
+    titleLarge: GoogleFonts.inter(color: AppColors.text),
+    titleMedium: GoogleFonts.inter(color: AppColors.text),
+    titleSmall: GoogleFonts.inter(color: AppColors.text),
+    labelMedium: GoogleFonts.inter(color: AppColors.textSecondary),
   ),
   iconTheme: IconThemeData(
     color: AppColors.text,
@@ -95,21 +107,27 @@ final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.backgroundDark,
+  fontFamily: GoogleFonts.inter().fontFamily,
   colorScheme: ColorScheme.dark(
-    primary: AppColors.primary,
-    secondary: AppColors.primary,
+    primary: AppColors.secondary,
+    secondary: AppColors.secondary,
     background: AppColors.backgroundDark,
     surface: AppColors.surfaceDark,
     onSurface: AppColors.textDark,
     onBackground: AppColors.textDark,
+    error: AppColors.red,
+    onError: Colors.white,
   ),
-  textTheme: TextTheme(
-    bodyLarge: TextStyle(color: AppColors.textDark),
-    bodyMedium: TextStyle(color: AppColors.textDark),
-    titleLarge: TextStyle(color: AppColors.textDark),
-    titleMedium: TextStyle(color: AppColors.textDark),
-    titleSmall: TextStyle(color: AppColors.textDark),
-    labelMedium: TextStyle(color: AppColors.textSecondaryDark),
+  textTheme: GoogleFonts.interTextTheme().apply(
+    bodyColor: AppColors.textDark,
+    displayColor: AppColors.textDark,
+  ).copyWith(
+    bodyLarge: GoogleFonts.inter(color: AppColors.textDark),
+    bodyMedium: GoogleFonts.inter(color: AppColors.textDark),
+    titleLarge: GoogleFonts.inter(color: AppColors.textDark),
+    titleMedium: GoogleFonts.inter(color: AppColors.textDark),
+    titleSmall: GoogleFonts.inter(color: AppColors.textDark),
+    labelMedium: GoogleFonts.inter(color: AppColors.textSecondaryDark),
   ),
   iconTheme: IconThemeData(
     color: AppColors.textDark,

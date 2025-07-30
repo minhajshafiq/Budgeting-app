@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/constants.dart';
+import '../core/constants/constants.dart';
 
 /// Un painter personnalisé qui dessine une flèche vers le bas
 class ArrowDownPainter extends CustomPainter {
